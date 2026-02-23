@@ -103,9 +103,74 @@ Build vector index:
 
 python -m app.ingest
 
+Or use the Makefile:
+
+make setup
+
 Run API:
 
 uvicorn app.main:app --reload
+
+Or:
+
+make run
+
+------------------------------------------------------------------------
+
+## Development
+
+### Testing
+
+This project includes comprehensive test coverage:
+
+```bash
+# Run all tests (excluding slow tests)
+make test
+
+# Run only unit tests
+make test-unit
+
+# Run integration tests  
+make test-integration
+
+# Run all tests including slow ones
+make test-all
+
+# Test with coverage report
+pytest --cov=app --cov-report=html
+```
+
+### Code Quality
+
+```bash
+# Format code
+make format
+
+# Run linting and security checks
+make lint
+
+# Install development dependencies
+make dev-setup
+```
+
+### Project Data
+
+The project now includes comprehensive realistic insurance policy documents:
+
+- **Auto Insurance**: Comprehensive coverage, deductibles, exclusions
+- **Health Insurance**: PPO plan with preventive care, specialist coverage
+- **Homeowners Insurance**: Dwelling, liability, personal property coverage  
+- **Life Insurance**: Whole life policy with cash value accumulation
+- **Business Insurance**: Commercial general liability and property coverage
+
+### CI/CD
+
+GitHub Actions workflow includes:
+- Automated testing across Python 3.9, 3.10, 3.11
+- Code quality checks (black, isort, flake8, mypy)
+- Security scanning (safety, bandit)
+- Coverage reporting
+- Integration testing
 
 ------------------------------------------------------------------------
 
@@ -116,3 +181,6 @@ uvicorn app.main:app --reload
 -   Evaluation benchmarking framework
 -   Observability and logging dashboard
 -   Support for local LLM inference (Ollama)
+-   Advanced caching strategies
+-   Multi-tenant support
+-   Real-time document updates

@@ -1,0 +1,188 @@
+name: Insurance RAG AI CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: "3.9"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create test environment file
+      run: |
+        echo "OPENAI_API_KEY=test-key-12345" > .env
+        echo "LLM_MODEL=gpt-4o-mini" >> .env
+
+    - name: Run unit tests
+      run: |
+        pytest tests/ -v -m "unit" --cov=app --cov-report=xml --cov-report=term-missing
+
+    - name: Run integration tests (without slow tests)
+      run: |
+        pytest tests/ -v -m "integration and not slow" --cov=app --cov-append --cov-report=xml
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install linting dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+
+    - name: Run black (code formatting check)
+      run: |
+        black --check --diff app/ tests/
+
+    - name: Run isort (import sorting check)  
+      run: |
+        isort --check-only --diff app/ tests/
+
+    - name: Run flake8 (linting)
+      run: |
+        flake8 app/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+
+    - name: Run mypy (type checking)
+      run: |
+        mypy app/ --ignore-missing-imports --no-strict-optional
+      continue-on-error: true  # Type checking failures won't fail the build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install safety bandit
+
+    - name: Check for known security vulnerabilities
+      run: |
+        safety check -r requirements.txt
+
+    - name: Run bandit security linter
+      run: |
+        bandit -r app/ -f json -o bandit-report.json
+      continue-on-error: true
+
+    - name: Upload bandit report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: bandit-security-report
+        path: bandit-report.json
+
+  build-test:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create test data and vector store
+      run: |
+        echo "OPENAI_API_KEY=test-key-12345" > .env
+        echo "LLM_MODEL=gpt-4o-mini" >> .env
+        
+        # Test data ingestion process
+        python -c "from app.ingest import build_index; build_index()"
+
+    - name: Test FastAPI application startup
+      run: |
+        # Test that the app can start successfully
+        timeout 10s uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+        sleep 5
+        curl -f http://localhost:8000/ || exit 1
+        pkill -f uvicorn
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run slow integration tests
+      env:
+        # Use a test OpenAI key or skip tests that require real API calls
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY_TEST }}
+      run: |
+        if [ -n "$OPENAI_API_KEY" ]; then
+          pytest tests/ -v -m "slow" --tb=short
+        else
+          echo "Skipping slow tests - no OpenAI API key provided"
+        fi

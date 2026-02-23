@@ -1,0 +1,2 @@
+# This file ensures the vector_store directory is tracked in git
+# The actual FAISS index, metadata, and cache files are ignored

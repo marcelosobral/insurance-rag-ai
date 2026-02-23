@@ -1,0 +1,82 @@
+HEALTH INSURANCE POLICY - PLATINUM PLAN
+
+Policy Number: HLT-2024-456123
+Group Number: EMP-8901
+Member ID: 987654321
+Effective Date: January 1, 2024 - December 31, 2024
+Member: Sarah Johnson
+Dependents: Michael Johnson (spouse), Emma Johnson (daughter, age 16)
+
+NETWORK COVERAGE:
+- In-Network Providers: Preferred Provider Organization (PPO)
+- Out-of-Network: Coverage available with higher cost-sharing
+- Emergency Care: Covered at in-network rates regardless of provider
+
+ANNUAL DEDUCTIBLES:
+- Individual: $1,500 (In-Network) / $3,000 (Out-of-Network)
+- Family: $3,000 (In-Network) / $6,000 (Out-of-Network)
+- Prescription Drugs: $150 Individual / $300 Family
+
+ANNUAL OUT-OF-POCKET MAXIMUMS:
+- Individual: $6,000 (In-Network) / $12,000 (Out-of-Network)  
+- Family: $12,000 (In-Network) / $24,000 (Out-of-Network)
+
+PREVENTIVE CARE (100% Covered, No Deductible):
+- Annual physical examinations
+- Routine immunizations and vaccinations
+- Mammograms and colonoscopies (age-appropriate screening)
+- Well-child visits and pediatric immunizations
+- Annual gynecological exams and Pap smears
+- Prostate cancer screening for men over 50
+- Mental health and substance abuse screenings
+
+PRIMARY CARE SERVICES:
+- Office visits: $25 copay (In-Network) / 70% after deductible (Out-of-Network)
+- Urgent care visits: $50 copay
+- Telemedicine consultations: $15 copay
+
+SPECIALIST CARE:
+- Specialist office visits: $50 copay (In-Network) / 60% after deductible (Out-of-Network)
+- Prior authorization required for certain specialists
+- Referral from primary care physician recommended but not required
+
+HOSPITAL SERVICES:
+- Inpatient hospital care: 80% after deductible (In-Network) / 60% after deductible (Out-of-Network)
+- Outpatient surgery: 85% after deductible
+- Emergency room visits: $250 copay (waived if admitted)
+- Ambulance services: 80% after deductible
+
+PRESCRIPTION DRUG COVERAGE:
+Tier 1 (Generic drugs): $10 copay
+Tier 2 (Preferred brand drugs): $35 copay  
+Tier 3 (Non-preferred brand drugs): $70 copay
+Tier 4 (Specialty drugs): 30% coinsurance (maximum $150 per prescription)
+
+MENTAL HEALTH & SUBSTANCE ABUSE:
+- Mental health office visits: Same as medical visits
+- Inpatient mental health treatment: Same as medical inpatient
+- Substance abuse treatment: Covered same as other medical conditions
+- Employee Assistance Program (EAP): Free confidential counseling
+
+MATERNITY CARE:
+- Prenatal and postnatal care: Covered as preventive care
+- Delivery and inpatient maternity care: Standard inpatient benefits apply
+- Newborn care: Automatically covered for first 31 days
+
+EXCLUSIONS AND LIMITATIONS:
+- Cosmetic surgery (unless medically necessary)
+- Experimental or investigational treatments
+- Services received outside the United States (except emergency care)
+- Services for work-related injuries (covered under workers compensation)
+- Non-prescription drugs and over-the-counter medications
+- Hearing aids (limited coverage up to $2,500 per ear every 5 years)
+- Acupuncture (covered up to 12 visits per year)
+
+CLAIM PROCEDURES:
+- In-network providers typically file claims directly
+- Out-of-network claims should be submitted within 365 days of service
+- Claims address: Health Insurance Claims, P.O. Box 12345, Chicago, IL 60601
+- Online portal available at www.healthinsurer.com for claim status
+
+COORDINATION OF BENEFITS:
+When covered by multiple health plans, this plan will coordinate benefits to prevent overpayment while ensuring maximum benefit coverage for the member.

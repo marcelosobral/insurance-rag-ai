@@ -12,11 +12,17 @@ def load_cache():
         return json.load(f)
 
 def save_cache(cache):
+    cache_dir = os.path.dirname(CACHE_PATH)
+    if cache_dir:
+        os.makedirs(cache_dir, exist_ok=True)
     with open(CACHE_PATH, "w") as f:
         json.dump(cache, f)
 
 def cosine_similarity(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+    denom = np.linalg.norm(a) * np.linalg.norm(b)
+    if denom == 0:
+        return 0.0
+    return float(np.dot(a, b) / denom)
 
 def check_cache(query, threshold=0.92):
     cache = load_cache()

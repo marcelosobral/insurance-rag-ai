@@ -17,6 +17,10 @@ INDEX_PATH = "vector_store/index.faiss"
 META_PATH = "vector_store/metadata.npy"
 
 def load_index():
+    if not os.path.exists(INDEX_PATH) or not os.path.exists(META_PATH):
+        raise FileNotFoundError(
+            "Vector index not found. Run `python -m app.ingest` to build it."
+        )
     index = faiss.read_index(INDEX_PATH)
     metadata = np.load(META_PATH, allow_pickle=True)
     return index, metadata

@@ -1,16 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from contextlib import asynccontextmanager
 from app.rag import generate_answer
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    from app.embeddings import get_model
+    get_model()
+    yield
+    # Shutdown (cleanup if needed)
+
+app = FastAPI(lifespan=lifespan)
 
 class QueryRequest(BaseModel):
     question: str
-
-@app.on_event("startup")
-def load_models():
-    from app.embeddings import get_model
-    get_model()
 
 @app.get("/")
 def health():
@@ -18,5 +22,8 @@ def health():
 
 @app.post("/query")
 def query_endpoint(request: QueryRequest):
-    result = generate_answer(request.question)
-    return result
+    try:
+        result = generate_answer(request.question)
+        return result
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))

@@ -11,7 +11,7 @@ def load_documents():
     docs = []
     metadata = []
 
-    for filename in os.listdir(DATA_DIR):
+    for filename in sorted(os.listdir(DATA_DIR)):
         if filename.endswith(".txt"):
             with open(os.path.join(DATA_DIR, filename), "r") as f:
                 text = f.read()
@@ -33,7 +33,11 @@ def build_index():
     docs, metadata = load_documents()
     embeddings = embed_texts(docs)
 
-    dimension = embeddings.shape[1]
+    if embeddings.ndim == 1:
+        dimension = 384
+        embeddings = embeddings.reshape(0, dimension)
+    else:
+        dimension = embeddings.shape[1]
     index = faiss.IndexFlatL2(dimension)
     index.add(embeddings)
 
