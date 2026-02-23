@@ -1,12 +1,13 @@
-import faiss
-import numpy as np
-from app.embeddings import embed_query
-from app.cache import check_cache, add_to_cache
-
 import os
 import time
-from openai import OpenAI
+
+import faiss
+import numpy as np
 from dotenv import load_dotenv
+from openai import OpenAI
+
+from app.cache import add_to_cache, check_cache
+from app.embeddings import embed_query
 
 load_dotenv()
 
@@ -16,6 +17,7 @@ LLM_MODEL = os.getenv("LLM_MODEL", "gpt-4o-mini")
 INDEX_PATH = "vector_store/index.faiss"
 META_PATH = "vector_store/metadata.npy"
 
+
 def load_index():
     if not os.path.exists(INDEX_PATH) or not os.path.exists(META_PATH):
         raise FileNotFoundError(
@@ -24,6 +26,7 @@ def load_index():
     index = faiss.read_index(INDEX_PATH)
     metadata = np.load(META_PATH, allow_pickle=True)
     return index, metadata
+
 
 def retrieve(query, top_k=3):
     index, metadata = load_index()
@@ -42,19 +45,18 @@ def retrieve(query, top_k=3):
         if distance > 1e10:
             continue
 
-        results.append({
-            "source": metadata[idx]["source"],
-            "text": metadata[idx]["text"],
-            "score": float(distance)
-        })
+        results.append(
+            {
+                "source": metadata[idx]["source"],
+                "text": metadata[idx]["text"],
+                "score": float(distance),
+            }
+        )
         scores.append(float(distance))
 
     avg_score = float(np.mean(scores)) if scores else 0.0
 
-    return {
-        "results": results,
-        "avg_score": avg_score
-    }
+    return {"results": results, "avg_score": avg_score}
 
 
 def generate_answer(query, top_k=3):
@@ -65,7 +67,7 @@ def generate_answer(query, top_k=3):
         return {
             **cached_response,
             "cache_hit": True,
-            "latency_seconds": round(time.time() - start_time, 3)
+            "latency_seconds": round(time.time() - start_time, 3),
         }
 
     retrieval = retrieve(query, top_k=top_k)
@@ -91,10 +93,13 @@ Answer:
     response = client.chat.completions.create(
         model=LLM_MODEL,
         messages=[
-            {"role": "system", "content": "You are a precise and factual AI assistant."},
-            {"role": "user", "content": prompt}
+            {
+                "role": "system",
+                "content": "You are a precise and factual AI assistant.",
+            },
+            {"role": "user", "content": prompt},
         ],
-        temperature=0
+        temperature=0,
     )
 
     answer = response.choices[0].message.content
@@ -105,13 +110,9 @@ Answer:
     final_response = {
         "answer": answer,
         "sources": sources,
-        "confidence": round(confidence, 3)
+        "confidence": round(confidence, 3),
     }
 
     add_to_cache(query, final_response)
 
-    return {
-        **final_response,
-        "cache_hit": False,
-        "latency_seconds": round(latency, 3)
-    }
+    return {**final_response, "cache_hit": False, "latency_seconds": round(latency, 3)}

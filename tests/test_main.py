@@ -1,6 +1,7 @@
+from unittest.mock import Mock, patch
+
 import pytest
-from unittest.mock import patch, Mock
-from fastapi.testclient import TestClient  
+from fastapi.testclient import TestClient
 
 
 class TestAPI:
@@ -9,7 +10,7 @@ class TestAPI:
     def test_health_endpoint(self, client):
         """Test health check endpoint"""
         response = client.get("/")
-        
+
         assert response.status_code == 200
         assert response.json() == {"status": "ok"}
 
@@ -21,20 +22,19 @@ class TestAPI:
             "sources": ["sample_policy.txt"],
             "confidence": 0.85,
             "cache_hit": False,
-            "latency_seconds": 0.45
+            "latency_seconds": 0.45,
         }
-        
-        with patch('app.main.generate_answer', return_value=mock_result):
+
+        with patch("app.main.generate_answer", return_value=mock_result):
             response = client.post(
-                "/query",
-                json={"question": "What does the policy cover?"}
+                "/query", json={"question": "What does the policy cover?"}
             )
-            
+
             assert response.status_code == 200
             data = response.json()
-            
+
             assert data["answer"] == mock_result["answer"]
-            assert data["sources"] == mock_result["sources"] 
+            assert data["sources"] == mock_result["sources"]
             assert data["confidence"] == mock_result["confidence"]
             assert data["cache_hit"] == mock_result["cache_hit"]
             assert data["latency_seconds"] == mock_result["latency_seconds"]
@@ -43,7 +43,7 @@ class TestAPI:
     def test_query_endpoint_missing_question(self, client):
         """Test query endpoint with missing question field"""
         response = client.post("/query", json={})
-        
+
         assert response.status_code == 422  # Validation error
 
     @pytest.mark.unit
@@ -52,9 +52,9 @@ class TestAPI:
         response = client.post(
             "/query",
             content="invalid json",
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
-        
+
         assert response.status_code == 422
 
     @pytest.mark.unit
@@ -65,23 +65,21 @@ class TestAPI:
             "sources": [],
             "confidence": 0.0,
             "cache_hit": False,
-            "latency_seconds": 0.01
+            "latency_seconds": 0.01,
         }
-        
-        with patch('app.main.generate_answer', return_value=mock_result):
-            response = client.post(
-                "/query", 
-                json={"question": ""}
-            )
-            
+
+        with patch("app.main.generate_answer", return_value=mock_result):
+            response = client.post("/query", json={"question": ""})
+
             assert response.status_code == 200
 
-    @pytest.mark.unit 
+    @pytest.mark.unit
     def test_startup_event(self):
         """Test startup event loads models"""
-        with patch('app.embeddings.get_model') as mock_get_model:
-            from app.main import lifespan
+        with patch("app.embeddings.get_model") as mock_get_model:
             import asyncio
+
+            from app.main import lifespan
 
             async def run_lifespan():
                 async with lifespan(None):
@@ -99,20 +97,25 @@ class TestAPI:
             "sources": ["test_policy.txt"],
             "confidence": 0.75,
             "cache_hit": True,
-            "latency_seconds": 0.12
+            "latency_seconds": 0.12,
         }
-        
-        with patch('app.main.generate_answer', return_value=mock_result):
+
+        with patch("app.main.generate_answer", return_value=mock_result):
             response = client.post(
-                "/query",
-                json={"question": "What is the deductible amount?"}
+                "/query", json={"question": "What is the deductible amount?"}
             )
-            
+
             assert response.status_code == 200
             data = response.json()
-            
+
             # Verify all expected fields in response
-            required_fields = ["answer", "sources", "confidence", "cache_hit", "latency_seconds"]
+            required_fields = [
+                "answer",
+                "sources",
+                "confidence",
+                "cache_hit",
+                "latency_seconds",
+            ]
             for field in required_fields:
                 assert field in data
 
@@ -120,11 +123,11 @@ class TestAPI:
     def test_query_request_model(self):
         """Test QueryRequest pydantic model"""
         from app.main import QueryRequest
-        
+
         # Valid request
         request = QueryRequest(question="What is covered?")
         assert request.question == "What is covered?"
-        
+
         # Test validation
         with pytest.raises(ValueError):
             QueryRequest()  # Missing required field
@@ -133,7 +136,7 @@ class TestAPI:
     def test_cors_headers(self, client):
         """Test CORS headers are present (if configured)"""
         response = client.get("/")
-        
+
         # Basic test - in production you might want to configure CORS
         assert response.status_code == 200
         # Could add CORS header checks if configured
@@ -141,10 +144,12 @@ class TestAPI:
     @pytest.mark.unit
     def test_query_endpoint_missing_index(self, client):
         """Test query endpoint when vector index is missing"""
-        with patch('app.main.generate_answer', side_effect=FileNotFoundError("Vector index not found")):
+        with patch(
+            "app.main.generate_answer",
+            side_effect=FileNotFoundError("Vector index not found"),
+        ):
             response = client.post(
-                "/query",
-                json={"question": "What does the policy cover?"}
+                "/query", json={"question": "What does the policy cover?"}
             )
 
             assert response.status_code == 503
