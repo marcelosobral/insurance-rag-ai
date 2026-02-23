@@ -5,8 +5,13 @@ from unittest.mock import Mock, mock_open, patch
 import numpy as np
 import pytest
 
-from app.cache import (add_to_cache, check_cache, cosine_similarity,
-                       load_cache, save_cache)
+from app.cache import (
+    add_to_cache,
+    check_cache,
+    cosine_similarity,
+    load_cache,
+    save_cache,
+)
 
 
 class TestCache:
