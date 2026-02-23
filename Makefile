@@ -15,6 +15,7 @@ help:
 	@echo "  format        Format code with black and isort"
 	@echo "  build-index   Build FAISS vector index from data"
 	@echo "  run           Start the development server"
+	@echo "  ci-health     Run CI-style health check"
 	@echo "  clean         Clean generated files"
 
 install:
@@ -57,6 +58,9 @@ format:
 
 run:
 	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+ci-health:
+	bash scripts/ci_health_check.sh
 
 run-prod:
 	uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4

@@ -154,7 +154,12 @@ jobs:
       run: |
         # Test that the app can start successfully
         timeout 10s uvicorn app.main:app --host 0.0.0.0 --port 8000 &
-        sleep 5
+        for i in {1..10}; do
+          if curl -f http://localhost:8000/; then
+            break
+          fi
+          sleep 1
+        done
         curl -f http://localhost:8000/ || exit 1
         pkill -f uvicorn
 
