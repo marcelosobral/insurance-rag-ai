@@ -1,6 +1,6 @@
 import os
 import tempfile
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
@@ -186,7 +186,8 @@ class TestIngest:
             test_file = os.path.join(data_dir, "test_policy.txt")
             with open(test_file, "w") as f:
                 f.write(
-                    "This policy provides comprehensive coverage for bodily injury and property damage."
+                    "This policy provides comprehensive coverage for "
+                    "bodily injury and property damage."
                 )
 
             index_path = os.path.join(vector_store_dir, "index.faiss")
